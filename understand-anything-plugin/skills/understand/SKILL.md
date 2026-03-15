@@ -185,9 +185,7 @@ If the reviewer reports `approved: false`:
    - Path to the output file
 4. Tell the user how to view the dashboard:
    ```
-   To view your codebase dashboard, clone the Understand Anything repo and run:
-     pnpm install && pnpm dev:dashboard
-   The dashboard auto-detects .understand-anything/knowledge-graph.json from the project root.
+   To view your dashboard, run: /understand-dashboard
    ```
 
 ## Error Handling
