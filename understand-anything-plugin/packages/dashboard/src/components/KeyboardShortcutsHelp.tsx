@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { KeyboardShortcut } from "../hooks/useKeyboardShortcuts";
 import { formatShortcutKey } from "../hooks/useKeyboardShortcuts";
 
@@ -11,17 +10,6 @@ export default function KeyboardShortcutsHelp({
   shortcuts,
   onClose,
 }: KeyboardShortcutsHelpProps) {
-  // Close on Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [onClose]);
-
   // Group shortcuts by category
   const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
     if (!acc[shortcut.category]) {

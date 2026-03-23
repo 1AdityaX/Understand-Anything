@@ -23,12 +23,6 @@ function App() {
   const codeViewerOpen = useDashboardStore((s) => s.codeViewerOpen);
   const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
   const setDiffOverlay = useDashboardStore((s) => s.setDiffOverlay);
-  const selectNode = useDashboardStore((s) => s.selectNode);
-  const toggleLayers = useDashboardStore((s) => s.toggleLayers);
-  const toggleDiffMode = useDashboardStore((s) => s.toggleDiffMode);
-  const stopTour = useDashboardStore((s) => s.stopTour);
-  const nextTourStep = useDashboardStore((s) => s.nextTourStep);
-  const prevTourStep = useDashboardStore((s) => s.prevTourStep);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
@@ -38,7 +32,6 @@ function App() {
       // Help
       {
         key: "?",
-        shiftKey: true,
         description: "Show keyboard shortcuts",
         action: () => setShowKeyboardHelp((prev) => !prev),
         category: "General",
@@ -48,14 +41,16 @@ function App() {
         key: "Escape",
         description: "Close panels and modals",
         action: () => {
+          // Read from store at invocation time to avoid stale closures
+          const state = useDashboardStore.getState();
           if (showKeyboardHelp) {
             setShowKeyboardHelp(false);
-          } else if (codeViewerOpen) {
-            closeCodeViewer();
-          } else if (selectedNodeId) {
-            selectNode(null);
-          } else if (tourActive) {
-            stopTour();
+          } else if (state.codeViewerOpen) {
+            state.closeCodeViewer();
+          } else if (state.selectedNodeId) {
+            state.selectNode(null);
+          } else if (state.tourActive) {
+            state.stopTour();
           }
         },
         category: "Navigation",
@@ -76,8 +71,9 @@ function App() {
         key: "ArrowRight",
         description: "Next tour step",
         action: () => {
-          if (tourActive) {
-            nextTourStep();
+          const state = useDashboardStore.getState();
+          if (state.tourActive) {
+            state.nextTourStep();
           }
         },
         category: "Tour",
@@ -86,8 +82,9 @@ function App() {
         key: "ArrowLeft",
         description: "Previous tour step",
         action: () => {
-          if (tourActive) {
-            prevTourStep();
+          const state = useDashboardStore.getState();
+          if (state.tourActive) {
+            state.prevTourStep();
           }
         },
         category: "Tour",
@@ -96,29 +93,23 @@ function App() {
       {
         key: "l",
         description: "Toggle layer visualization",
-        action: toggleLayers,
+        action: () => {
+          const state = useDashboardStore.getState();
+          state.toggleLayers();
+        },
         category: "View",
       },
       {
         key: "d",
         description: "Toggle diff mode",
-        action: toggleDiffMode,
+        action: () => {
+          const state = useDashboardStore.getState();
+          state.toggleDiffMode();
+        },
         category: "View",
       },
     ],
-    [
-      showKeyboardHelp,
-      codeViewerOpen,
-      selectedNodeId,
-      tourActive,
-      closeCodeViewer,
-      selectNode,
-      stopTour,
-      nextTourStep,
-      prevTourStep,
-      toggleLayers,
-      toggleDiffMode,
-    ]
+    [showKeyboardHelp]
   );
 
   // Register keyboard shortcuts

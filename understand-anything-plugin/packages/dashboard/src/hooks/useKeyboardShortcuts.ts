@@ -19,6 +19,13 @@ export function useKeyboardShortcuts(
     if (!enabled) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Prevent shortcuts from firing when typing in input fields
+      const target = event.target as HTMLElement;
+      const tagName = target.tagName.toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea' || target.isContentEditable) {
+        if (event.key !== 'Escape') return;
+      }
+
       for (const shortcut of shortcuts) {
         const keyMatches = event.key.toLowerCase() === shortcut.key.toLowerCase();
         const ctrlMatches = shortcut.ctrlKey ? event.ctrlKey : !event.ctrlKey;
@@ -45,11 +52,16 @@ export function useKeyboardShortcuts(
 export function formatShortcutKey(shortcut: KeyboardShortcut): string {
   const keys: string[] = [];
 
+  // Use userAgentData with fallback to navigator.platform
+  const isMac = (navigator as Navigator & { userAgentData?: { platform: string } }).userAgentData?.platform
+    ? (navigator as Navigator & { userAgentData: { platform: string } }).userAgentData.platform === 'macOS'
+    : navigator.platform.includes("Mac");
+
   if (shortcut.ctrlKey || shortcut.metaKey) {
-    keys.push(navigator.platform.includes("Mac") ? "⌘" : "Ctrl");
+    keys.push(isMac ? "⌘" : "Ctrl");
   }
   if (shortcut.shiftKey) keys.push("⇧");
-  if (shortcut.altKey) keys.push(navigator.platform.includes("Mac") ? "⌥" : "Alt");
+  if (shortcut.altKey) keys.push(isMac ? "⌥" : "Alt");
 
   keys.push(shortcut.key.toUpperCase());
 
